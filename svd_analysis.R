@@ -9,9 +9,9 @@ library(rasterVis)
 library(rgdal)
 
 ### Settings
-data <- "yield_2045_2055" # natural_cmass, total_cpool, total_lai, avg_cflux, natural_avg_cmass, ...
+data <- "npool_2069_2098" # natural_cmass, total_cpool, total_lai, avg_cflux, natural_avg_cmass, ...
 
-setwd(paste("/media/jan/AddData/Simulations_processed/", data, sep=""))
+setwd(paste("/media/jan/AddData/Simulations_processed/30y_avg_all/", data, sep=""))
 system("ls -l")
 
 ### Load data
@@ -163,10 +163,10 @@ plot(all.eff, col="orange", pch=19)
 #writeLines(as.character(all.eff), fileConn)
 #close(fileConn)
 
-saveRDS(all.eff, file = paste("anova_", data, ".rds", sep=""))
+#saveRDS(all.eff, file = paste("anova_", data, ".rds", sep=""))
 
 ###### Maps of mean approximation and group deviations
-out.stack <- stack()
+#out.stack <- stack()
 
 ### Estimation of mean
 X_common <- matrix(0, nrow(df), 1) 
@@ -188,7 +188,7 @@ X_ab1[, 2] <- Ureg %*% alpha_1[, rcp85[1]]
 X_amean1 <- rowMeans(abs(X_ab1)) # mean is zero due to standardization
 X_amean1 <- cbind(coords + 0.25, X_amean1)
 
-X_amean1_sp <- SpatialPointsDataFrame(X_amean1[, 1:2], as.data.frame(X_amean1[, 3]), proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#X_amean1_sp <- SpatialPointsDataFrame(X_amean1[, 1:2], as.data.frame(X_amean1[, 3]), proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 out.stack[[2]] <- rasterize(as.data.frame(X_amean1)[, 1:2], r, as.data.frame(X_amean1)[, 3])
 
 
@@ -203,7 +203,7 @@ X_ab2[, 3] <- Ureg %*% alpha_2[, ichec[1]]
 X_amean2 <- rowMeans(abs(X_ab2)) # mean is zero due to standardization
 X_amean2 <- cbind(coords + 0.25, X_amean2)
 
-X_amean2_sp <- SpatialPointsDataFrame(X_amean2[, 1:2], as.data.frame(X_amean2[, 3]), proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#X_amean2_sp <- SpatialPointsDataFrame(X_amean2[, 1:2], as.data.frame(X_amean2[, 3]), proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 out.stack[[3]] <- rasterize(as.data.frame(X_amean2)[, 1:2], r, as.data.frame(X_amean2)[, 3])
 
 ### Estimation of variable PROJECT
@@ -216,7 +216,7 @@ X_ab3[, 2] <- Ureg %*% alpha_3[, cordex[1]]
 X_amean3 <- rowMeans(abs(X_ab3)) # mean is zero due to standardization
 X_amean3 <- cbind(coords + 0.25, X_amean3)
 
-X_amean3_sp <- SpatialPointsDataFrame(X_amean3[, 1:2], as.data.frame(X_amean3[, 3]), proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#X_amean3_sp <- SpatialPointsDataFrame(X_amean3[, 1:2], as.data.frame(X_amean3[, 3]), proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 out.stack[[4]] <- rasterize(as.data.frame(X_amean3)[, 1:2], r, as.data.frame(X_amean3)[, 3])
 
 ### Estimation of variable RESOLUTION
@@ -229,9 +229,20 @@ X_ab4[, 2] <- Ureg %*% alpha_4[, min30[1]]
 X_amean4 <- rowMeans(abs(X_ab4)) 
 X_amean4 <- cbind(coords + 0.25, X_amean4)
 
-X_amean4_sp <- SpatialPointsDataFrame(X_amean4[, 1:2], as.data.frame(X_amean4[, 3]), proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#X_amean4_sp <- SpatialPointsDataFrame(X_amean4[, 1:2], as.data.frame(X_amean4[, 3]), proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 out.stack[[5]] <- rasterize(as.data.frame(X_amean4)[, 1:2], r, as.data.frame(X_amean4)[, 3])
 
+### Estimation of INDIVIDUAL EFFECT
+X_ind_no_mean <- matrix(0, nrow(df), ncol(alpha_res)) 
+for(indx in 1:ncol(alpha_res)) {
+  X_ind_no_mean[, indx] <- Ureg %*% alpha_res[, indx]
+}
+X_ind <- rowMeans(abs(X_ind_no_mean)) 
+X_ind <- cbind(coords + 0.25, X_ind)
+
+#X_ind_sp <- SpatialPointsDataFrame(X_ind[, 1:2], as.data.frame(X_ind[, 3]), proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+out.stack[[6]] <- rasterize(as.data.frame(X_ind)[, 1:2], r, as.data.frame(X_ind)[, 3])
+
 ### Save
-save(out.stack, file="out_stack.RData")
+save(out.stack, file="out_stack_inkl_indiv_eff.RData")
  
