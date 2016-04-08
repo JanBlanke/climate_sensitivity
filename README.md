@@ -1,2 +1,2 @@
 # climate_sensitivity
-Scripts for the paper "Importance of variable climate input data for continental simulations with LPJ-GUESS"
+R scripts for the manuscript "Effect of climate data on simulated carbon and nitrogen balances for Europe" submitted to *Journal of Geophysical Research: Biogeosciences*.
